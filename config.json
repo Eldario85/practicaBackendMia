@@ -2,7 +2,7 @@
     "database": {
         "host "    : "localhost",
         "user"     : "root",
-        "password" : "dario",
+        "password" : "",
         "database" : "backend"
     },
     "server": {

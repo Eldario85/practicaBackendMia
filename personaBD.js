@@ -55,7 +55,31 @@ persona_bd.create = function(persona, funCallBack){
     })
 }
 
+persona_bd.update = function(persona, dni, funCallBack){
+    parametros= [persona.dni, persona.nombre, persona.apellido, dni];
 
+    $query = 'UPDATE persona SET dni=?, nombre=?, apellido=? WHERE dni=?';
+    connection.query($query, parametros, (err, rows)=>{
+        if(err){
+            funCallBack({
+                mensaje: "error del servidor",
+                detalle: err
+            });
+            return;
+        } else{
+            if(rows.affectedRows==0){
+                funCallBack(undefined,{
+                    message: `No se encontro la persona ${persona.params.dni}`
+                });
+            }else{
+                funCallBack(undefined,{
+                    message:  `Se modifico la persona ${persona.nombre} ${persona.apellido} ${persona.params.dni} `,
+                    detail: rows
+                })
+            }
+        }
+    });
+};
 
 
 

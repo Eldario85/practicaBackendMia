@@ -43,30 +43,15 @@ app.post("/api/persona", function (req, res) {
 
 
 app.put("/api/persona/:dni", function (req, res) {
-    parametros= [req.body.dni, req.body.nombre, req.body.apellido, req.params.dni];
-
-    $query = 'UPDATE persona SET dni=?, nombre=?, apellido=? WHERE dni=?';
-    connection.query($query, parametros, (err, rows)=>{
+    let persona_a_modificar = req.body;
+    let dni = req.params.dni;
+    personaBd.update(persona_a_modificar, dni, (err, resultado)=>{
         if(err){
-            res.status(500).send({
-                mensaje: "error del servidor",
-                detalle: err
-            });
-            return;
+            res.status(500).send(err);
         } else{
-            if(rows.affectedRows==0){
-                res.status(404).send({
-                    message: `No se encontro la persona ${req.params.dni}`
-                });
-            }else{
-                res.send({
-                    message:  `Se modifico la persona ${req.body.nombre} ${req.body.apellido} ${req.body.dni} `,
-                    detail: rows
-                })
-            }
+            res.json(resultado)
         }
     })
-
 });
 
 
