@@ -15,6 +15,9 @@ connection.connect((err) => {
   }
 });
 
+
+
+
 user_bd.getAll = function (funCallBack) {
   $query = "SELECT * FROM usuario";
   connection.query($query, (err, rows) => {
@@ -34,7 +37,7 @@ user_bd.create = function (usuario, funCallBack) {
     if (err) {
       if (err.code == "ER_DUP_ENTRY") {
         funCallBack({
-          mensaje: "el usuario ya fue registrada",
+          mensaje: "el usuario ya fue registrado",
           detalle: err,
         });
       } else {
@@ -46,15 +49,15 @@ user_bd.create = function (usuario, funCallBack) {
       return;
     } else {
       funCallBack(undefined, {
-        message: `Se creo el usuario ${usuario.mail} ${usuario.nickname} `,
+        message: `Se creo el usuario ${usuario.nickname} `,
         detail: detail_bd,
       });
     }
   });
 };
 
-user_bd.update = function (mail, usuario, funCallBack) {
-  parametros = [usuario.mail, usuario.nickname, usuario.password, mail];
+user_bd.modificar = function (mail, usuario, funCallBack) {
+  parametros = [mail, usuario.mail, usuario.nickname, usuario.password];
 
   consulta = "UPDATE usuario SET mail= ?, nickname= ?, password= ? WHERE mail=?";
   connection.query(consulta, parametros, (err, rows) => {
@@ -63,13 +66,40 @@ user_bd.update = function (mail, usuario, funCallBack) {
         mensaje: "error del servidor",
         detalle: err,
       });
-    } else {
+    } else{
       funCallBack(undefined, {
-        message: `Se modifico el usuario ${usuario.nickname}`,
+        message: `Se modifico la persona ${mail} ${usuario.nickname} `,
         detalle: rows,
       });
-    }
+    };
   });
+}
+
+
+user_bd.borrar = function(mail, funCallBack){
+    
+  consulta = 'DELETE FROM usuario WHERE mail=?';
+    connection.query(consulta, mail, (err, rows)=>{
+        if(err){
+            funCallBack({
+                mensaje: "error del servidor",
+                detalle: err
+            });
+            return;
+        } else{
+            if(rows.affectedRows==0){
+                funCallBack({
+                    message: `No se encontro la persona ${mail}`
+                });
+            }else{
+                funCallBack({
+                    message:  `Se ELIMINO la persona  ${mail} `,
+                    detail: rows
+                })
+            }
+        }
+    })
+
 };
 
 

@@ -63,14 +63,42 @@ persona_bd.update = function (a_quien, persona, funCallBack) {
         mensaje: "error del servidor",
         detalle: err,
       });
-    } else {
+    } else{
+      if(rows.affectedRows==0){
+      funCallBack({
+          message: `No se encontro la persona ${a_quien}`
+      });} else {
       funCallBack(undefined, {
         message: `Se modifico la persona ${persona.nombre} ${persona.apellido} `,
         detalle: rows,
       });
     }
+  };
   });
-};
+}
+
+persona_bd.borrar = function(dni, funCallBack){
+  consulta = 'DELETE FROM persona WHERE dni=?';
+  connection.query(consulta, dni, (err, rows)=>{
+      if(err){
+          funCallBack({
+              mensaje: "error del servidor",
+              detalle: err
+          });
+          return;
+      } else{
+          if(rows.affectedRows==0){
+              funCallBack({
+                  message: `No se encontro la persona ${dni}`
+              });
+          }else{
+              funCallBack({
+                  message:  `Se ELIMINO la persona  ${dni} `,
+                  detail: rows
+              })
+          }
+      }
+    })};
 
 
 

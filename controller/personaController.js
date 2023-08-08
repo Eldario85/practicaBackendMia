@@ -52,29 +52,17 @@ app.put("/:dni", function (req, res) {
 
 
 app.delete("/:dni", function (req, res) {
-
-    $query = 'DELETE FROM persona WHERE dni=?';
-    connection.query($query, req.params.dni, (err, rows)=>{
+    dni= req.params.dni
+    personaBd.borrar(dni, (err, resultado)=>{
         if(err){
-            res.status(500).send({
-                mensaje: "error del servidor",
-                detalle: err
-            });
-            return;
+            res.status(500).send(err);
         } else{
-            if(rows.affectedRows==0){
-                res.status(404).send({
-                    message: `No se encontro la persona ${req.params.dni}`
-                });
-            }else{
-                res.send({
-                    message:  `Se ELIMINO la persona  ${req.params.dni} `,
-                    detail: rows
-                })
-            }
+            res.send(resultado)
         }
     })
-
+   
 });
+
+
 
 module.exports = app;
