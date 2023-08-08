@@ -10,76 +10,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan("tiny"));
 morgan(":method :url :status :res[content-length] - :response-time ms");
 
-const configuraciones = require("config.json")
-
-const personaBd = require("personaBD.js")
+const configuraciones = require("config.json");
 
 
+const controladorPersona = require("controller/personaController");
+const controladorusuario = require("controller/userController");
 
-app.get("/api/persona", (req, res)=> {
-    personaBd.getAll((err, resultado)=>{
-        if(err){
-            res.status(500).send(err);
-        } else{
-            res.json(resultado)
-        }
-    });
-});
+app.use('/api/persona', controladorPersona);
+app.use('/api/user', controladorusuario);
 
 
 
-app.post("/api/persona", function (req, res) {
- let persona_a_crear = req.body;
 
- personaBd.create(persona_a_crear, (err, resultado)=>{
-    if(err){
-        res.status(500).send(err);
-    } else{
-        res.json(resultado)
-    }
- }); 
-});
-
-
-
-app.put("/api/persona/:dni", function (req, res) {
-    let persona_a_modificar = req.body;
-    let dni = req.params.dni;
-    personaBd.update(persona_a_modificar, dni, (err, resultado)=>{
-        if(err){
-            res.status(500).send(err);
-        } else{
-            res.json(resultado)
-        }
-    })
-});
-
-
-app.delete("/api/persona/:dni", function (req, res) {
-
-    $query = 'DELETE FROM persona WHERE dni=?';
-    connection.query($query, req.params.dni, (err, rows)=>{
-        if(err){
-            res.status(500).send({
-                mensaje: "error del servidor",
-                detalle: err
-            });
-            return;
-        } else{
-            if(rows.affectedRows==0){
-                res.status(404).send({
-                    message: `No se encontro la persona ${req.params.dni}`
-                });
-            }else{
-                res.send({
-                    message:  `Se ELIMINO la persona  ${req.params.dni} `,
-                    detail: rows
-                })
-            }
-        }
-    })
-
-});
 
 app.listen(configuraciones.server.port, (err) => {
   if (err) {
