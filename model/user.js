@@ -2,12 +2,11 @@ var user_bd = {};
 
 const mysql = require("mysql");
 const configuraciones = require("config.json");
-// Agregue las credenciales para acceder a su base de datos
+
 var connection = mysql.createConnection(configuraciones.database);
 
-// conectarse a mysql
+// coneccion a mysql
 connection.connect((err) => {
-  // en caso de error
   if (err) {
     console.log(err);
   } else {
@@ -15,25 +14,55 @@ connection.connect((err) => {
   }
 });
 
+//--------consultas en base de datos-------///
 
-
-
+//Buscar todos los usuarios en BD
 user_bd.getAll = function (funCallBack) {
-  $query = "SELECT * FROM usuario";
-  connection.query($query, (err, rows) => {
+  consulta = "SELECT * FROM usuario";
+  connection.query(consulta, (err, rows) => {
     if (err) {
-      funCallBack(err);
-      return;
+      funCallBack({
+        mensaje: "surgio un error en la consulta",
+        detalle: err,
+      });
     }
-    funCallBack(rows);
+    funCallBack(undefined, {
+      message: `Esta es la lista de usuarios `,
+      detail: rows,
+    });
   });
 };
 
+//buscar usuarios por mail en BD
+user_bd.getByMail = function (mail, funCallBack) {
+  consulta = "SELECT * FROM usuario WHERE mail=?";
+  connection.query(consulta, mail, (err, rows) => {
+    if (err) {
+      funCallBack({
+        mensaje: "surgio un error en la consulta",
+        detalle: err,
+      });
+    } else {
+      if (rows == 0) {
+        funCallBack(undefined, {
+          message: `No se encontro el usuario con mail ${mail}`,
+        });
+      } else {
+        funCallBack(undefined, {
+          message: `Este es el usuario con el mail ${mail}`,
+          detail: rows,
+        });
+      }
+    }
+  });
+};
+
+//crear usuario en BD
 user_bd.create = function (usuario, funCallBack) {
-  $query = "INSERT INTO usuario (mail, nickname, password) VALUES(?,?,?)";
+  consulta = "INSERT INTO usuario (mail, nickname, password) VALUES(?,?,?)";
   parametros = [usuario.mail, usuario.nickname, usuario.password];
 
-  connection.query($query, parametros, (err, detail_bd) => {
+  connection.query(consulta, parametros, (err, detail_bd) => {
     if (err) {
       if (err.code == "ER_DUP_ENTRY") {
         funCallBack({
@@ -56,8 +85,9 @@ user_bd.create = function (usuario, funCallBack) {
   });
 };
 
+//modificar usuarios en BD
 user_bd.modificar = function (mail, usuario, funCallBack) {
-  parametros = [mail, usuario.mail, usuario.nickname, usuario.password];
+  parametros = [usuario.mail, usuario.nickname, usuario.password, mail];
 
   consulta = "UPDATE usuario SET mail= ?, nickname= ?, password= ? WHERE mail=?";
   connection.query(consulta, parametros, (err, rows) => {
@@ -66,42 +96,47 @@ user_bd.modificar = function (mail, usuario, funCallBack) {
         mensaje: "error del servidor",
         detalle: err,
       });
-    } else{
+    } else {
+      if (rows.affectedRows == 0) {
+        funCallBack(undefined,{
+          message: `No se encontro ningun usuario con ese mail`
+        });
+      } else if(rows.changedRows==0){
+        funCallBack(undefined, {
+          message: 'No se modifico el usuario'
+        })
+      } else{
       funCallBack(undefined, {
         message: `Se modifico la persona ${mail} ${usuario.nickname} `,
         detalle: rows,
       });
-    };
+    }};
   });
-}
-
-
-user_bd.borrar = function(mail, funCallBack){
-    
-  consulta = 'DELETE FROM usuario WHERE mail=?';
-    connection.query(consulta, mail, (err, rows)=>{
-        if(err){
-            funCallBack({
-                mensaje: "error del servidor",
-                detalle: err
-            });
-            return;
-        } else{
-            if(rows.affectedRows==0){
-                funCallBack({
-                    message: `No se encontro la persona ${mail}`
-                });
-            }else{
-                funCallBack({
-                    message:  `Se ELIMINO la persona  ${mail} `,
-                    detail: rows
-                })
-            }
-        }
-    })
-
 };
 
-
+//borrar usuarios de BD
+user_bd.borrar = function (mail, funCallBack) {
+  consulta = "DELETE FROM usuario WHERE mail=?";
+  connection.query(consulta, mail, (err, rows) => {
+    if (err) {
+      funCallBack({
+        mensaje: "error del servidor",
+        detalle: err,
+      });
+      return;
+    } else {
+      if (rows.affectedRows == 0) {
+        funCallBack({
+          message: `No se encontro la persona ${mail}`,
+        });
+      } else {
+        funCallBack({
+          message: `Se ELIMINO la persona  ${mail} `,
+          detail: rows,
+        });
+      }
+    }
+  });
+};
 
 module.exports = user_bd;
