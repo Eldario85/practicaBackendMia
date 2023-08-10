@@ -44,7 +44,7 @@ user_bd.getByMail = function (mail, funCallBack) {
       });
     } else {
       if (rows == 0) {
-        funCallBack(undefined, {
+        funCallBack({
           message: `No se encontro el usuario con mail ${mail}`,
         });
       } else {
@@ -98,11 +98,11 @@ user_bd.modificar = function (mail, usuario, funCallBack) {
       });
     } else {
       if (rows.affectedRows == 0) {
-        funCallBack(undefined,{
+        funCallBack({
           message: `No se encontro ningun usuario con ese mail`
         });
       } else if(rows.changedRows==0){
-        funCallBack(undefined, {
+        funCallBack({
           message: 'No se modifico el usuario'
         })
       } else{
