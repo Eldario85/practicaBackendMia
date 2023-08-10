@@ -32,6 +32,18 @@ app.get("/:apellido", (req, res) => {
   });
 });
 
+app.get("/buscar/:dni", (req, res) => {
+  let buscarNick = req.params.dni;
+
+  personaBd.getUser(buscarNick, (err, resultado) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.json(resultado);
+    }
+  });
+});
+
 //Crear personas
 app.post("/", function (req, res) {
   let persona_a_crear = req.body;

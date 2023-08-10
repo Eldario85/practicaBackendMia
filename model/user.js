@@ -59,8 +59,8 @@ user_bd.getByMail = function (mail, funCallBack) {
 
 //crear usuario en BD
 user_bd.create = function (usuario, funCallBack) {
-  consulta = "INSERT INTO usuario (mail, nickname, password) VALUES(?,?,?)";
-  parametros = [usuario.mail, usuario.nickname, usuario.password];
+  consulta = "INSERT INTO usuario (mail, nickname, password, persona) VALUES(?,?,?,?)";
+  parametros = [usuario.mail, usuario.nickname, usuario.password, usuario.persona];
 
   connection.query(consulta, parametros, (err, detail_bd) => {
     if (err) {

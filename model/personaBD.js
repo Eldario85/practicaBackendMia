@@ -57,6 +57,33 @@ persona_bd.getByApellido = function (apellido, funCallBack) {
   });
 };
 
+//Buscar usuario de persona en base de datos
+persona_bd.getUser = function (buscarNick, funCallBack) {
+  //"SELECT usuario.nickname FROM usuario where persona=?";
+  consulta = "Select usuario.nickname, persona.nombre, persona.apellido from usuario inner join persona on persona.dni = usuario.persona where usuario.persona = ?";
+  connection.query(consulta, buscarNick, (err, rows) => {
+    if (err) {
+      funCallBack({
+        mensaje: "surgio un error en la consulta",
+        detalle: err,
+      });
+    } else {
+      if (rows == 0) {
+        funCallBack( {
+          message: `El usuario dni ${buscarNick} no posee usuario en este sistema`,
+          detalle: err,
+        });
+      } else {
+        funCallBack(undefined, {
+          message: `Este es el usuario, nombre y apellido del dni° ${buscarNick}`,
+          detail: rows,
+        });
+      }
+    }
+  });
+};
+
+
 //Crear persona en base de datos
 persona_bd.create = function (persona, funCallBack) {
   $query = "INSERT INTO persona (dni, nombre, apellido) VALUES(?,?,?)";
